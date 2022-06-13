@@ -53,10 +53,16 @@ namespace WebAPI.Controllers
             if (request == null)
                 return BadRequest();
 
-            //TO DO: Impl filter request;
-
             var flightList = await GetCache(cancellationToken);
-            return Ok(flightList.OrderByDescending(f1=> f1.Arrival).Select(f1=> 
+
+            return Ok(
+                flightList
+                .OrderByDescending(f1=> f1.Arrival)
+                .Where(f1 => 
+                    (String.Concat(request.Origin) != "" ? f1.Origin == request.Origin : true)
+                     &&
+                    (String.Concat(request.Destination) != "" ? f1.Destination == request.Destination : true))
+                .Select(f1=> 
                 new FlightDTO() 
                 { 
                     Departure = f1.Departure,
