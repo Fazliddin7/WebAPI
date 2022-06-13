@@ -16,9 +16,11 @@ namespace WebApplication3.Controllers
     {
 
         private readonly IRepository _repository;
-        public LoginController(IRepository repository)
+        private readonly IConfiguration _configuration;
+        public LoginController(IRepository repository, IConfiguration configuration)
         {
             _repository = repository;
+            _configuration = configuration;
         }
 
         [HttpPost, Route("login")]
@@ -33,23 +35,17 @@ namespace WebApplication3.Controllers
                 if (user != null)
                 {
                     var role = await _repository.SingleAsync<RoleEntity>(f1 => f1.Id == user.RoleId);
-                    var secretKey = new SymmetricSecurityKey
-                    (Encoding.UTF8.GetBytes("thisisasecretkey@123"));
-                    var signinCredentials = new SigningCredentials
-                   (secretKey, SecurityAlgorithms.HmacSha256);
-                    var jwtSecurityToken = new JwtSecurityToken(
-                        issuer: "AuthServer",
-                        audience: "AuthServer123",
-                        claims: new List<Claim>()
-                        {
-                            new Claim(ClaimTypes.Role, role.Code),
-                            new Claim(ClaimTypes.Name, loginDTO.UserName)
-                        },
-                        expires: DateTime.Now.AddMinutes(10),
-                        signingCredentials: signinCredentials
-                    );
-                    return Ok(new JwtSecurityTokenHandler().
-                    WriteToken(jwtSecurityToken));
+                    var token = GetToken(new List<Claim>()
+                    {
+                        new Claim(ClaimTypes.Name, loginDTO.UserName),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        new Claim(ClaimTypes.Role, role.Code),
+                    });
+                    return Ok(new
+                    {
+                        token = new JwtSecurityTokenHandler().WriteToken(token),
+                        expiration = token.ValidTo
+                    });
                 }
             }
             catch
@@ -58,6 +54,21 @@ namespace WebApplication3.Controllers
                 ("An error occurred in generating the token");
             }
             return Unauthorized();
+        }
+
+        private JwtSecurityToken GetToken(List<Claim> authClaims)
+        {
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:ValidIssuer"],
+                audience: _configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddHours(3),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                );
+
+            return token;
         }
     }
 }
