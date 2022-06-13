@@ -47,7 +47,7 @@ namespace WebAPI.Controllers
             _memoryCache.Set(cacheKey, flightList, GetCacheExpiryOptions);
         }
 
-        [HttpPost]
+        [HttpPost, Authorize]
         public async Task<ActionResult<IEnumerable<FlightDTO>>> Get(FlightGetRequest request, CancellationToken cancellationToken)
         {
             if (request == null)
