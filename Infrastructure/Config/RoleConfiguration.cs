@@ -18,8 +18,8 @@ namespace Infrastructure.Config
 
             builder.HasData(new RoleEntity[]
             {
-                new RoleEntity { Id=1, Code="Moderator"},
-                new RoleEntity { Id=2, Code="Client"}
+                new RoleEntity { Id=1, Code = "Moderator"},
+                new RoleEntity { Id=2, Code = "Client"}
             });
         }
     }

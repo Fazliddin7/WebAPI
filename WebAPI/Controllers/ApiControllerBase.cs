@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 
 namespace WebAPI.Controllers
 {
@@ -16,6 +15,5 @@ namespace WebAPI.Controllers
             _mediator = mediator ?? throw new ArgumentNullException();
 
         }
-
     }
 }
