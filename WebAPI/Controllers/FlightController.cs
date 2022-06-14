@@ -15,7 +15,7 @@ namespace WebAPI.Controllers
         public FlightController(IMediator mediator) : base(mediator) { }
 
         [HttpPost("getAll"), Authorize]
-        public async Task<ActionResult<IEnumerable<FlightDTO>>> GetAll([FromBody] GetFlightCommand request, CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<FlightLookupDTO>>> GetAll([FromBody] GetFlightCommand request, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(request, cancellationToken);
             return Ok(result);

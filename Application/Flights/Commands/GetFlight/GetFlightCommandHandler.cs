@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Application.Flights.Commands.GetFlight
 {
-    public class GetFlightCommandHandler: IRequestHandler<GetFlightCommand, List<FlightLookupDto>>
+    public class GetFlightCommandHandler: IRequestHandler<GetFlightCommand, List<FlightLookupDTO>>
     {
         private readonly IRepository _repository;
         private readonly IFlightCache _flightChace;
@@ -12,7 +12,7 @@ namespace Application.Flights.Commands.GetFlight
             _repository = repository;
             _flightChace = flightChace;
         }
-        public async Task<List<FlightLookupDto>> Handle(GetFlightCommand request, CancellationToken cancellationToken)
+        public async Task<List<FlightLookupDTO>> Handle(GetFlightCommand request, CancellationToken cancellationToken)
         {
             var flightList = await _flightChace.GetCache(cancellationToken);
 
@@ -21,7 +21,7 @@ namespace Application.Flights.Commands.GetFlight
                     (String.Concat(request.Origin) != "" ? f1.Origin == request.Origin : true)
                      &&
                     (String.Concat(request.Destination) != "" ? f1.Destination == request.Destination : true))
-                .Select(f2 => new FlightLookupDto()
+                .Select(f2 => new FlightLookupDTO()
                 {
                     Arrival = f2.Arrival,
                     Departure = f2.Departure,

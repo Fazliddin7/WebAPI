@@ -2,7 +2,7 @@
 
 namespace Application.Flights.Commands.GetFlight
 {
-    public class FlightLookupDto
+    public class FlightLookupDTO
     {
         public int Id { get; set; }
         public String Origin { get; set; }
