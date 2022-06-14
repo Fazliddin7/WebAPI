@@ -5,12 +5,24 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Events;
 using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .WriteTo.File("NotesWebAppLog-.txt", rollingInterval:
+        RollingInterval.Day)
+    .CreateLogger();
+
+
+builder.Logging.AddSerilog(Log.Logger);
+Log.Logger.Debug("Start WebAPI");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));

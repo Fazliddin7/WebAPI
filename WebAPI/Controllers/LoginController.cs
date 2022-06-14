@@ -17,15 +17,18 @@ namespace WebApplication3.Controllers
 
         private readonly IRepository _repository;
         private readonly IConfiguration _configuration;
-        public LoginController(IRepository repository, IConfiguration configuration)
+        private readonly ILogger<LoginController> _logger;
+        public LoginController(IRepository repository, IConfiguration configuration, ILogger<LoginController> logger)
         {
             _repository = repository;
             _configuration = configuration;
+            _logger = logger; ;
         }
 
         [HttpPost, Route("login")]
         public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
+            
             try
             {
                 if (string.IsNullOrEmpty(loginDTO.UserName) || string.IsNullOrEmpty(loginDTO.Password))
@@ -41,6 +44,7 @@ namespace WebApplication3.Controllers
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim(ClaimTypes.Role, role.Code),
                     });
+                    _logger.LogInformation($"user: {user.UserName} - logginig");
                     return Ok(new
                     {
                         token = new JwtSecurityTokenHandler().WriteToken(token),
