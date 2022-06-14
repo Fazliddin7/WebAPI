@@ -50,10 +50,21 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-
 builder.Services.AddSwaggerGen(option =>
 {
-    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
+    option.SwaggerDoc(
+        "v1",
+        new OpenApiInfo 
+        { 
+            Title = "Flight Web API", 
+            Version = "v1",
+            Contact = new OpenApiContact
+            {
+                Name = "Makhamatov Fazliddin",
+                Email = "Undeclared1993@list.ru",
+                Url = new Uri("https://github.com/Fazliddin7/")
+            }
+        });
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -78,6 +89,7 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
+
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
