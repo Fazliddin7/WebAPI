@@ -1,5 +1,4 @@
 using Application;
-using Domain.Services;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -26,10 +25,7 @@ Log.Logger.Debug("Start WebAPI");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
-
-builder.Services.AddTransient<IRepository, EfRepository>();
-builder.Services.AddTransient<IFlightService, FlightService>();
-builder.Services.AddMemoryCache();
+builder.Services.AddApplication();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthentication(x =>

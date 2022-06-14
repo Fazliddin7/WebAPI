@@ -1,6 +1,8 @@
 ﻿using Application.DTO;
-using Domain.Models;
-using Domain.Services;
+using Application.Flights.Commands.CreateFlight;
+using Application.Flights.Commands.GetFlight;
+using Application.Flights.Commands.UpdateFlight;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,77 +10,30 @@ namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class FlightController : ControllerBase
+    public class FlightController : ApiControllerBase
     {
-        private readonly IFlightService _flightService;
+        public FlightController(IMediator mediator) : base(mediator) { }
 
-        public FlightController(IFlightService flightService)
+        [HttpPost("getAll"), Authorize]
+        public async Task<ActionResult<IEnumerable<FlightDTO>>> GetAll([FromBody] GetFlightCommand request, CancellationToken cancellationToken)
         {
-            _flightService = flightService;
+            var result = await _mediator.Send(request, cancellationToken);
+            return Ok(result);
         }
 
-        [HttpPost, Authorize]
-        public async Task<ActionResult<IEnumerable<FlightDTO>>> Get(FlightGetRequest request, CancellationToken cancellationToken)
-        {
-            if (request == null)
-                return BadRequest();
-
-            var flightList = await _flightService.GetAll(request.Origin, request.Destination, cancellationToken);
-
-            return Ok(
-                flightList.Select(f1=> 
-                new FlightDTO() 
-                { 
-                    Departure = f1.Departure,
-                    Destination = f1.Destination,
-                    Arrival = f1.Arrival,
-                    Origin = f1.Origin,
-                    Status = f1.Status,
-                    Id = f1.Id
-                }));
-        }
 
         [HttpPost("create"), Authorize(Roles = "Moderator")]
-        public async Task<ActionResult> Create([FromBody] FlightDTO request, CancellationToken cancellationToken)
+        public async Task<ActionResult<int>> Create([FromBody] CreateFlightCommand request, CancellationToken cancellationToken)
         {
-            if (request == null)
-                return BadRequest();
-
-            var result = await _flightService.AddNew(
-                new Flight()
-                { 
-                    Arrival = request.Arrival,
-                    Departure = request.Departure,
-                    Destination = request.Destination,
-                    Origin = request.Origin,
-                    Status = request.Status
-                },
-                cancellationToken);
-
-            return Ok(new FlightDTO
-            {
-                Departure = result.Departure,
-                Destination = result.Destination,
-                Arrival = result.Arrival,
-                Origin = result.Origin,
-                Status = result.Status,
-                Id = result.Id
-            });
+            var flightId =  await _mediator.Send(request, cancellationToken);
+            return Ok(flightId);
         }
 
         [HttpPost("changeStatus"), Authorize(Roles = "Moderator")]
-        public async Task<ActionResult> ChangeStatus([FromBody] FlightChangeStatusRequest request, CancellationToken cancellationToken)
+        public async Task<ActionResult> ChangeStatus([FromBody] UpdateFlightCommand request, CancellationToken cancellationToken)
         {
-            if (request == null)
-                return BadRequest();
-
-            var result = await _flightService.UpdateStatus(request.Id, request.Status,
-                cancellationToken);
-
-            if(result == null)
-                return NotFound();
-
-            return Ok(result);
+            await _mediator.Send(request, cancellationToken);
+            return NoContent();
         }
     }
 }

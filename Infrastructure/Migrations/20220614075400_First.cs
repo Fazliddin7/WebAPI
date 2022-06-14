@@ -19,7 +19,8 @@ namespace Infrastructure.Migrations
                     Destination = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Departure = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Arrival = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false)
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    DateCreate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {

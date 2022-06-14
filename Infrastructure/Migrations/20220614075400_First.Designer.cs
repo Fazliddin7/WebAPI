@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220613185637_First")]
+    [Migration("20220614075400_First")]
     partial class First
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,6 +33,9 @@ namespace Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<DateTimeOffset>("Arrival")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("DateCreate")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset>("Departure")

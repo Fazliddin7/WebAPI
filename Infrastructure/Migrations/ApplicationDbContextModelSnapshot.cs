@@ -33,6 +33,9 @@ namespace Infrastructure.Migrations
                     b.Property<DateTimeOffset>("Arrival")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<DateTimeOffset>("DateCreate")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<DateTimeOffset>("Departure")
                         .HasColumnType("datetimeoffset");
 
