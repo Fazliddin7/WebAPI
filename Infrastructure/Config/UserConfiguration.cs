@@ -20,13 +20,6 @@ namespace Infrastructure.Config
 
             builder.HasIndex(p => p.UserName).IsUnique();
             builder.Property(p => p.UserName).HasMaxLength(256);
-            builder.Property(p => p.Password).HasMaxLength(256);
-
-            builder.HasData(new UserEntity[]
-            {
-                new UserEntity { Id=1, UserName="Moderator", Password="Moderator", RoleId = 1},
-                new UserEntity { Id=2, UserName="Client", Password="Client", RoleId = 2},
-            });
         }
     }
 }

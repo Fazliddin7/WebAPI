@@ -1,11 +1,6 @@
 ﻿using Application.DTO;
-using Domain.Services;
-using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using WebAPI.Services;
 
 namespace WebApplication3.Controllers
 {
@@ -15,64 +10,63 @@ namespace WebApplication3.Controllers
     public class LoginController : ControllerBase
     {
 
-        private readonly IRepository _repository;
-        private readonly IConfiguration _configuration;
+
         private readonly ILogger<LoginController> _logger;
-        public LoginController(IRepository repository, IConfiguration configuration, ILogger<LoginController> logger)
+        private readonly IUserService _userService;
+        public LoginController(IUserService userService, ILogger<LoginController> logger)
         {
-            _repository = repository;
-            _configuration = configuration;
+            _userService = userService;
             _logger = logger; ;
         }
 
         [HttpPost, Route("login")]
         public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
-            
             try
             {
                 if (string.IsNullOrEmpty(loginDTO.UserName) || string.IsNullOrEmpty(loginDTO.Password))
                     return BadRequest("Username and/or Password not specified");
 
-                var user = await _repository.SingleAsync<UserEntity>(f1=> f1.UserName == loginDTO.UserName && f1.Password == loginDTO.Password);
-                if (user != null)
+                var result = await _userService.Authenticate(loginDTO);
+
+                _logger.LogInformation($"Login - user: {loginDTO.UserName} - logginig");
+                return Ok(new
                 {
-                    var role = await _repository.SingleAsync<RoleEntity>(f1 => f1.Id == user.RoleId);
-                    var token = GetToken(new List<Claim>()
-                    {
-                        new Claim(ClaimTypes.Name, loginDTO.UserName),
-                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                        new Claim(ClaimTypes.Role, role.Code),
-                    });
-                    _logger.LogInformation($"user: {user.UserName} - logginig");
-                    return Ok(new
-                    {
-                        token = new JwtSecurityTokenHandler().WriteToken(token),
-                        expiration = token.ValidTo
-                    });
-                }
+                    result
+                });
             }
             catch
             {
                 return BadRequest
                 ("An error occurred in generating the token");
             }
-            return Unauthorized();
         }
 
-        private JwtSecurityToken GetToken(List<Claim> authClaims)
+        [HttpPost, Route("Register")]
+        public async Task<IActionResult> Register(RegisterUserRequest loginDTO)
         {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+            try
+            {
+                if (string.IsNullOrEmpty(loginDTO.UserName) || string.IsNullOrEmpty(loginDTO.Password))
+                    return BadRequest("Username and/or Password not specified");
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddHours(3),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-            );
+                await _userService.Register(loginDTO);
 
-            return token;
+                _logger.LogInformation($"Register - user: {loginDTO.UserName} - Register");
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest
+                ("An error occurred in generating the token");
+            }
+        }
+
+        [HttpGet, Route("Roles")]
+        public async Task<IActionResult> Roles()
+        {
+            var roles = await _userService.GetRoles();
+            return Ok(roles);
         }
     }
 }

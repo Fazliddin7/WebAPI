@@ -7,7 +7,7 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
 using System.Text;
-
+using WebAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
@@ -89,6 +89,9 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
+
+builder.Services.AddTransient<IJwtAuthManager, JwtAuthManager>();
+builder.Services.AddTransient<IUserService, UserService>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
