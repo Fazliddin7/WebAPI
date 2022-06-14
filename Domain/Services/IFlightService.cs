@@ -13,7 +13,7 @@ namespace Domain.Services
     {
         Task<Flight> AddNew(Flight flight, CancellationToken cancellationToken);
 
-        Task<IEnumerable<Flight>> GetAll(CancellationToken cancellationToken);
+        Task<IEnumerable<Flight>> GetAll(String origin, String destination, CancellationToken cancellationToken);
 
         Task<Flight> UpdateStatus(int id, FlightStatus status, CancellationToken cancellationToken);
     }

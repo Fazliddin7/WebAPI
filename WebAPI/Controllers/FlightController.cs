@@ -13,38 +13,10 @@ namespace WebAPI.Controllers
     public class FlightController : ControllerBase
     {
         private readonly IFlightService _flightService;
-        private IMemoryCache _memoryCache;
 
-        public FlightController(IFlightService flightService, IMemoryCache memoryCache)
+        public FlightController(IFlightService flightService)
         {
             _flightService = flightService;
-            _memoryCache = memoryCache;
-        }
-
-        private MemoryCacheEntryOptions GetCacheExpiryOptions
-            => new MemoryCacheEntryOptions
-            {
-                AbsoluteExpiration = DateTime.Now.AddMinutes(5),
-                Priority = CacheItemPriority.High,
-                SlidingExpiration = TimeSpan.FromMinutes(2)
-            };
-
-        private async Task<List<Flight>> GetCache(CancellationToken cancellationToken)
-        {
-            var cacheKey = "flightList";
-            if (!_memoryCache.TryGetValue(cacheKey, out List<Flight> flightList))
-            {
-                flightList = (await _flightService.GetAll(cancellationToken)).ToList();
-                _memoryCache.Set(cacheKey, flightList, GetCacheExpiryOptions);
-            }
-
-            return flightList;
-        }
-
-        private void SetCache(List<Flight> flightList)
-        {
-            var cacheKey = "flightList";
-            _memoryCache.Set(cacheKey, flightList, GetCacheExpiryOptions);
         }
 
         [HttpPost, Authorize]
@@ -53,16 +25,10 @@ namespace WebAPI.Controllers
             if (request == null)
                 return BadRequest();
 
-            var flightList = await GetCache(cancellationToken);
+            var flightList = await _flightService.GetAll(request.Origin, request.Destination, cancellationToken);
 
             return Ok(
-                flightList
-                .OrderByDescending(f1=> f1.Arrival)
-                .Where(f1 => 
-                    (String.Concat(request.Origin) != "" ? f1.Origin == request.Origin : true)
-                     &&
-                    (String.Concat(request.Destination) != "" ? f1.Destination == request.Destination : true))
-                .Select(f1=> 
+                flightList.Select(f1=> 
                 new FlightDTO() 
                 { 
                     Departure = f1.Departure,
@@ -91,12 +57,6 @@ namespace WebAPI.Controllers
                 },
                 cancellationToken);
 
-            var cache = await GetCache(cancellationToken);
-            var current = cache.FirstOrDefault(f1 => f1.Id == result.Id);
-            if (current == null)
-                cache.Add(result);
-            SetCache(cache);
-
             return Ok(new FlightDTO
             {
                 Departure = result.Departure,
@@ -119,15 +79,6 @@ namespace WebAPI.Controllers
 
             if(result == null)
                 return NotFound();
-
-            var cache = await GetCache(cancellationToken);
-
-            var current = cache.FirstOrDefault(f1 => f1.Id == result.Id);
-            if(current != null)
-                cache.Remove(current);
-            cache.Add(result);
-
-            SetCache(cache);
 
             return Ok(result);
         }
