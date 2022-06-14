@@ -8,6 +8,8 @@ namespace Tests.Common
 {
     public  class FlightContextFactory
     {
+        public const String FlightDestination = "Dest1";
+        public const String FlightOrigin = "Origin2";
         public const int FlightIdForDelete = 3;
         public const int FlightIdForUpdate = 4;
         public static ApplicationDbContext Create()
@@ -26,7 +28,7 @@ namespace Tests.Common
                         Id = 1,
                         Arrival = DateTime.Now,
                         Departure = DateTime.Now,
-                        Destination  = "Dest1",
+                        Destination  = FlightDestination,
                         Origin = "Orig1",
                         Status = Domain.Enums.FlightStatus.InTime
                     }
@@ -39,7 +41,7 @@ namespace Tests.Common
                         Arrival = DateTime.Now,
                         Departure = DateTime.Now,
                         Destination = "Dest1",
-                        Origin = "Orig1",
+                        Origin = FlightOrigin,
                         Status = Domain.Enums.FlightStatus.InTime
                     }
                 ),
