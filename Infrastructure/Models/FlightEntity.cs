@@ -34,7 +34,7 @@ namespace Infrastructure.Models
         public FlightStatus Status { get; set; }
         public DateTimeOffset DateCreate { get; set; }
 
-        public static FlightEntity New(Flight payment)
-            => new(payment.Origin, payment.Destination, payment.Departure, payment.Arrival, FlightStatus.InTime, DateTimeOffset.UtcNow);
+        public static FlightEntity New(Flight flight)
+            => new(flight.Origin, flight.Destination, flight.Departure, flight.Arrival, FlightStatus.InTime, DateTimeOffset.UtcNow);
     }
 }
