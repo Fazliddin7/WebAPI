@@ -20,7 +20,7 @@ namespace Application.Flights.Commands.GetFlight
             return flightList.OrderByDescending(f1 => f1.Arrival)
                 .Where(f1 =>
                     (String.Concat(request.Origin) != "" ? f1.Origin == request.Origin : true)
-                     &&
+                     ||
                     (String.Concat(request.Destination) != "" ? f1.Destination == request.Destination : true))
                 .Select(f2 => new FlightLookupDTO()
                 {

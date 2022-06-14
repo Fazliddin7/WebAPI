@@ -1,5 +1,4 @@
-﻿using Application.DTO;
-using Application.Flights.Commands.CreateFlight;
+﻿using Application.Flights.Commands.CreateFlight;
 using Application.Flights.Commands.GetFlight;
 using Application.Flights.Commands.UpdateFlight;
 using MediatR;

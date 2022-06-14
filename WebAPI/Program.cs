@@ -1,4 +1,5 @@
 using Application;
+using Application.Interfaces;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -89,7 +90,8 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
-
+builder.Services.AddSingleton<ICurrentUserService, CurrentUserService>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IJwtAuthManager, JwtAuthManager>();
 builder.Services.AddTransient<IUserService, UserService>();
 

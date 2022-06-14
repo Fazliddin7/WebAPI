@@ -15,10 +15,10 @@ namespace Application
             services.AddTransient<IFlightCache, FlightCache>();
             services.AddMemoryCache();
 
-            //services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddValidatorsFromAssemblies(new[] { Assembly.GetExecutingAssembly() });
             services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidationBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>),typeof(LoggingBehavior<,>));
             return services;
         }
     }
