@@ -10,22 +10,25 @@ namespace Tests.Common
     {
         protected readonly FlightCache flightCache;
         protected readonly EfRepository efRepository;
-        private readonly ApplicationDbContext context;
+        private readonly ApplicationDbContext _context;
+        private readonly IMemoryCache _memoryCache;
         public TestCommandBase()
         {
-            context = FlightContextFactory.Create();
-            efRepository = new EfRepository(context);
+            _context = FlightContextFactory.Create();
+            efRepository = new EfRepository(_context);
 
             var services = new ServiceCollection();
             services.AddMemoryCache();
             var serviceProvider = services.BuildServiceProvider();
-            var memoryCache = serviceProvider.GetService<IMemoryCache>();
-            flightCache = new FlightCache(efRepository, memoryCache);
+            _memoryCache = serviceProvider.GetService<IMemoryCache>();
+            flightCache = new FlightCache(efRepository, _memoryCache);
+            
         }
 
         public void Dispose()
         {
-            FlightContextFactory.Destroy(context);
+            _memoryCache.Dispose();
+            FlightContextFactory.Destroy(_context);
         }
     }
 }
