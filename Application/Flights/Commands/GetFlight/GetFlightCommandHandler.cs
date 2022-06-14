@@ -12,6 +12,7 @@ namespace Application.Flights.Commands.GetFlight
             _repository = repository;
             _flightChace = flightChace;
         }
+
         public async Task<List<FlightLookupDTO>> Handle(GetFlightCommand request, CancellationToken cancellationToken)
         {
             var flightList = await _flightChace.GetCache(cancellationToken);
